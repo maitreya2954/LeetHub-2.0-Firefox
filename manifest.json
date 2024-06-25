@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "LeetHub v2",
-  "description": "Automatically integrate your Leetcode & GeeksforGeeks submissions to GitHub",
-  "homepage_url": "https://github.com/arunbhardwaj/LeetHub-2.0",
+  "name": "LeetHub 2.0 for Firefox",
+  "description": "Automatically integrate your Leetcode & GeeksforGeeks submissions to GitHub in Firefox",
+  "homepage_url": "https://github.com/maitreya2954/LeetHub-2.0-Firefox",
   "version": "__LH_VERSION__",
-  "author": "Arun Bhardwaj",
+  "author": "Siddharth Rayabharam",
   "action": {
     "default_icon": "assets/thumbnail.png",
     "default_popup": "popup.html",
@@ -16,7 +16,7 @@
     "128": "assets/thumbnail.png"
   },
   "background": {
-    "service_worker": "scripts/background.js"
+    "scripts": ["scripts/background.js"]
   },
   "permissions": [
     "unlimitedStorage",
