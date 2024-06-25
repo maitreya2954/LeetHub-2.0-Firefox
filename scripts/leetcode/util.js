@@ -80,16 +80,6 @@ function delay(func, wait, ...args) {
   return setTimeout(() => func(...args), wait);
 }
 
-function getBrowser() {
-  if (typeof chrome !== 'undefined' && typeof chrome.runtime !== 'undefined') {
-    return chrome;
-  } else if (typeof browser !== 'undefined' && typeof browser.runtime !== 'undefined') {
-    return browser;
-  } else {
-    throw new LeetHubError('BrowserNotSupported');
-  }
-}
-
 function getDifficulty(difficulty) {
   difficulty = difficulty.toUpperCase().trim();
   return DIFFICULTY[difficulty] ?? DIFFICULTY.UNKNOWN;
@@ -138,7 +128,6 @@ export {
   delay,
   DIFFICULTY,
   formatStats,
-  getBrowser,
   getDifficulty,
   isEmpty,
   languages,

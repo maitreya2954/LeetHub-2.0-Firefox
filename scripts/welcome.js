@@ -130,7 +130,7 @@ const handleLinkRepoError = (statusCode, name) => {
     Method for linking hook with an existing repository 
     Steps:
     1. Check if existing repository exists and the user has write access to it.
-    2. Link Hook to it (chrome Storage).
+    2. Link Hook to it (chrome/Browser Storage).
 */
 const linkRepo = (token, name) => {
   const AUTHENTICATION_URL = `https://api.github.com/repos/${name}`;
@@ -235,7 +235,7 @@ $('#hook_button').on('click', () => {
     /* 
       Perform processing
       - step 1: Check if current stage === hook.
-      - step 2: store repo name as repoName in chrome storage.
+      - step 2: store repo name as repoName in chrome/browser storage.
       - step 3: if (1), POST request to repoName (iff option = create new repo) ; else display error message.
       - step 4: if proceed from 3, hide hook_mode and display commit_mode (show stats e.g: files pushed/questions-solved/leaderboard)
     */

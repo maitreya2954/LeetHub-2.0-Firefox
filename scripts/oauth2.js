@@ -27,9 +27,10 @@ const oAuth2 = {
       url += this.SCOPES[i];
     }
 
-    chrome.storage.local.set({ pipe_leethub: true }, () => {
+    
+    BrowserUtil.instance.storage.local.set({ pipe_leethub: true }, () => {
       // opening pipe temporarily, redirects to github
-      chrome.tabs.create({ url, active: true }, function () {});
+      browser.tabs.create({ url, active: true }, function () {});
     });
   },
 };

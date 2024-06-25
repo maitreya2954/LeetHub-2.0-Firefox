@@ -133,7 +133,7 @@ const gfgLoader = setInterval(() => {
 
           // if language was found
           if (language !== null) {
-            chrome.storage.local.get('stats', (s) => {
+            BrowserUtil.instance.storage.local.get('stats', (s) => {
               const { stats } = s;
               const fileName = toKebabCase(title + language);
               const filePath = probName + fileName;

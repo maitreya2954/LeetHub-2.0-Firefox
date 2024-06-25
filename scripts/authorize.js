@@ -2,7 +2,6 @@
     (needs patch) 
     IMPLEMENTATION OF AUTHENTICATION ROUTE AFTER REDIRECT FROM GITHUB.
 */
-
 const localAuth = {
   /**
    * Initialize
@@ -13,8 +12,8 @@ const localAuth = {
       'https://github.com/login/oauth/access_token';
     this.AUTHORIZATION_URL =
       'https://github.com/login/oauth/authorize';
-    this.CLIENT_ID = '0114dd35b156d4729fac';
-    this.CLIENT_SECRET = 'cfc3301d9745530bf1b31e92528ad9c31fd3f995';
+    this.CLIENT_ID = 'Ov23liMeWjRNjUo5vymQ';
+    this.CLIENT_SECRET = '48be4eedd455041e092cba5e059c8f65fd27f0d3';
     this.REDIRECT_URL = 'https://github.com/'; // for example, https://github.com
     this.SCOPES = ['repo'];
   },
@@ -26,9 +25,9 @@ const localAuth = {
    */
   parseAccessCode(url) {
     if (url.match(/\?error=(.+)/)) {
-      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      BrowserUtil.instance.tabs.query({ active: true, currentWindow: true }, function(tabs) {
         var tab = tabs[0];
-        chrome.tabs.remove(tab.id, function() {})
+        BrowserUtil.instance.tabs.remove(tab.id, function() {})
       });
     } else {
       this.requestToken(url.match(/\?code=([\w\/\-]+)/)[1]);
@@ -55,7 +54,7 @@ const localAuth = {
             xhr.responseText.match(/access_token=([^&]*)/)[1],
           );
         } else {
-          chrome.runtime.sendMessage({
+          BrowserUtil.instance.runtime.sendMessage({
             closeWebPage: true,
             isSuccess: false,
           });
@@ -81,7 +80,7 @@ const localAuth = {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           const username = JSON.parse(xhr.responseText).login;
-          chrome.runtime.sendMessage({
+          BrowserUtil.instance.runtime.sendMessage({
             closeWebPage: true,
             isSuccess: true,
             token,
@@ -102,7 +101,7 @@ const link = window.location.href;
 
 /* Check for open pipe */
 if (window.location.host === 'github.com') {
-  chrome.storage.local.get('pipe_leethub', (data) => {
+  BrowserUtil.instance.storage.local.get('pipe_leethub', (data) => {
     if (data && data.pipe_leethub) {
       localAuth.parseAccessCode(link);
     }

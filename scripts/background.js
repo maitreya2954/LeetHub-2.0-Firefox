@@ -1,4 +1,6 @@
-let api = isChrome() ? chrome : isFirefox() ? browser : undefined;
+
+
+let api = isChrome() ? chrome : isStandardBrowser() ? browser : undefined;
 
 api.runtime.onInstalled.addListener(details => {
   if (details.reason === 'install') {
@@ -53,6 +55,6 @@ function isChrome() {
   return typeof chrome !== 'undefined' && typeof chrome.runtime !== 'undefined';
 }
 
-function isFirefox() {
+function isStandardBrowser() {
   return typeof browser !== 'undefined' && typeof browser.runtime !== 'undefined';
 }
