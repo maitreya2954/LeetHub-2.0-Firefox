@@ -1,57 +1,63 @@
+/* Body styling */
 body {
-  background-color: #000000 !important;
+  background-color: #f5f5f5; /* Changed to light gray */
   padding: 10px;
   text-align: center;
   transition: background-color 0.75s ease;
-  font-family: 'Helvetica Neue', 'Lucida Grande', sans-serif;
+  font-family: 'Roboto', 'Helvetica Neue', 'Lucida Grande', sans-serif; /* Updated font */
+  color: #333333; /* Dark gray text */
 }
 
+/* Title styling */
 #title {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
-  font-size: 5em;
+  font-family: 'Norwester', 'Roboto', 'Helvetica Neue', 'Lucida Grande', sans-serif;
+  font-size: 3em; /* Reduced size for modern look */
   font-weight: bold;
   margin-bottom: 0px;
   margin-top: 10px;
+  color: #333333; /* Dark gray text */
 }
 
+/* Caption styling */
 .caption {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Norwester', 'Roboto', 'Helvetica Neue', 'Lucida Grande', sans-serif;
   font-size: 1.5em;
   font-weight: normal !important;
-  margin-top: 3px !important;
+  margin-top: 1em !important;
   margin-bottom: 0px;
+  color: #333333 !important; /* Dark gray text */
 }
+
+/* Error message styling */
 #error {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Norwester', 'Roboto', 'Helvetica Neue', 'Lucida Grande', sans-serif;
   font-weight: normal !important;
   color: red !important;
   margin-bottom: 0px;
 }
 
+/* Success message styling */
 #success {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Norwester', 'Roboto', 'Helvetica Neue', 'Lucida Grande', sans-serif;
   font-size: 1.1em;
   font-weight: normal !important;
-  color: green !important;
   margin-bottom: 0px;
 }
 
+/* Unlink message styling */
 #unlink {
-  font-family: 'Norwester', 'Helvetica Neue', 'Lucida Grande',
-    sans-serif;
+  font-family: 'Norwester', 'Roboto', 'Helvetica Neue', 'Lucida Grande', sans-serif;
   font-size: 1.1em;
   font-weight: normal !important;
-  color: green !important;
   margin-bottom: 0px;
 }
 
+/* Paragraph text styling */
 p {
-  color: white !important;
+  color: #333333 !important; /* Dark gray text */
 }
+
+/* Onboarding text styling */
 .onboarding {
   font-family: sans-serif;
   border-top: solid white 1px;
@@ -59,7 +65,79 @@ p {
   font-size: medium;
 }
 
+/* Anchor tag styling */
 a {
-  color: white !important;
+  color: #1e90ff !important; /* Updated color for links */
   cursor: pointer;
+}
+
+/* New CSS for modern layout */
+.highlight {
+  color: #ff6c0a;
+}
+
+.leet {
+  color: black;
+}
+
+.ui.start {
+  margin: 0.7em !important;
+}
+
+.ui.grid.container {
+  padding: 2em 0;
+}
+
+.ui.button {
+  background-color: #ff6c0a;
+  color: #ffffff;
+  font-size: 1em;
+}
+
+.ui.button:hover {
+  background-color: #e65a00;
+}
+
+#hook_mode .ui.form .field,
+#commit_mode .ui.inverted.large.header {
+  margin-top: 1em;
+}
+
+.ui.inverted.large.header {
+  font-size: 2em;
+  color: #333333;
+}
+
+.ui.inverted.large.header .difficulty {
+  padding: 1em;
+  font-size: 0.8em !important;
+}
+
+.ui.inverted.large.header .easy {
+  color: #5cb85c;
+}
+
+.ui.inverted.large.header .medium {
+  color: #f0ad4e;
+}
+
+.ui.inverted.large.header .hard {
+  color: #d9534f;
+}
+
+.feature-request {
+  color: #1e90ff !important;
+  font-size: 0.8em;
+}
+
+.github-link {
+  color: rgb(143, 202, 202) !important;
+}
+
+.github-link .leet {
+  color: black;
+}
+
+.github-link .hub {
+  color: #ff6c0a !important;
 }
