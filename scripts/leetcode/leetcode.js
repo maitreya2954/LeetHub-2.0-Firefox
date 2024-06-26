@@ -23,7 +23,7 @@ const readmeFilename = 'README.md';
 const NORMAL_PROBLEM = 0;
 const EXPLORE_SECTION_PROBLEM = 1;
 
-const WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS = 500;
+const WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS = 1500;
 
 const api = BrowserUtil.instance;
 
@@ -34,8 +34,8 @@ const getPath = (problem, filename) => {
 /* Main function for uploading code to GitHub repo, and callback cb is called if success */
 const upload = (token, hook, content, problem, filename, sha, message) => {
   const path = getPath(problem, filename);
-  const URL = `https://BrowserUtil.instance.github.com/repos/${hook}/contents/${path}`;
-
+  const URL = `https://api.github.com/repos/${hook}/contents/${path}`;
+  
   let data = {
     message,
     content,
@@ -218,7 +218,7 @@ function uploadGit(
 /* Returns GitHub data for the file specified by `${directory}/${filename}` path */
 async function getGitHubFile(token, hook, directory, filename) {
   const path = getPath(directory, filename);
-  const URL = `https://BrowserUtil.instance.github.com/repos/${hook}/contents/${path}`;
+  const URL = `https://api.github.com/repos/${hook}/contents/${path}`;
 
   let options = {
     method: 'GET',
@@ -481,7 +481,7 @@ async function v2SubmissionHandler(event, leetCode) {
 }
 
 // Use MutationObserver to determine when the submit button elements are loaded
-const submitBtnObserver = new MutationObserver(function (_mutations, observer) {
+const submitBtnObserver = new MutationObserver(function (mutations, observer) {
   const v1SubmitBtn = document.querySelector('[data-cy="submit-code-btn"]');
   const v2SubmitBtn = document.querySelector('[data-e2e-locator="console-submit-button"]');
   const textareaList = document.getElementsByTagName('textarea');
@@ -504,10 +504,8 @@ const submitBtnObserver = new MutationObserver(function (_mutations, observer) {
     observer.disconnect();
 
     const leetCode = new LeetCodeV2();
-    if (!!!v2SubmitBtn.onclick) {
-      textarea.addEventListener('keydown', e => v2SubmissionHandler(e, leetCode));
-      v2SubmitBtn.onclick = e => v2SubmissionHandler(e, leetCode);
-    }
+    textarea.addEventListener('keydown', e => v2SubmissionHandler(e, leetCode));
+    v2SubmitBtn.addEventListener('click', e => v2SubmissionHandler(e, leetCode));
   }
 });
 
