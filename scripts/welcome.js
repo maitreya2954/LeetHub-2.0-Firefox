@@ -214,7 +214,7 @@ $('#type').on('change', function () {
   }
 });
 
-$('#hook_button').on('click', () => {
+const linkGitRepo = (e) => {
   /* on click should generate: 1) option 2) repository name */
   if (!option()) {
     $('#error').text(
@@ -264,6 +264,13 @@ $('#hook_button').on('click', () => {
         });
       }
     });
+  }
+};
+
+$('#hook_button').on('click', linkGitRepo);
+$('#name').on('keypress', (e) => { // Link repo on pressing Enter/Return
+  if (e.which == 13) {
+    linkGitRepo(e);
   }
 });
 
