@@ -1,10 +1,13 @@
 const BrowserUtil = {
 
     instance: undefined,
+
+    isChrome: false,
+
     /**
      * Fetches appropriate browser api
      */
-    setBrowser() {
+    init() {
         if (this.instance === undefined) {
             if (typeof chrome !== 'undefined' && typeof chrome.runtime !== 'undefined') {
                 this.instance = chrome;
@@ -14,7 +17,8 @@ const BrowserUtil = {
                 throw new LeetHubError('BrowserNotSupported');
             }
         }
+        this.isChrome = window.navigation !== undefined;
     }
 }
 
-BrowserUtil.setBrowser();
+BrowserUtil.init();

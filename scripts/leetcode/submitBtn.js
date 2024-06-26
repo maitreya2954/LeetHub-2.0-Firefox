@@ -64,11 +64,12 @@ function setupManualSubmitBtn(submitBtnHandler) {
     if (btns && btns.children.length < 3 && url.match(/\/submissions\//)) {
       observer.disconnect();
       addManualSubmitBtn(submitBtnHandler);
+    } else if (btns && btns.children.length == 3) {
+      observer.disconnect();
     }
   });
 
-  // todo: change this to be firefox friendly https://developer.mozilla.org/en-US/docs/Web/API/Window/navigation
-  window.navigation.addEventListener('navigate', () => {
+  const navigationCallback = () => {
     const isSubmissionUrl = window.location.href.match(/leetcode\.com\/(.*)\/submissions\/(\d+)/);
     if (isSubmissionUrl) {
       submissionPageBtnsObserver.observe(document.body, {
@@ -76,7 +77,22 @@ function setupManualSubmitBtn(submitBtnHandler) {
         subtree: true,
       });
     }
-  });
+  }
+
+  // Fallback for firefox which didnt implement window.Navigation API yet
+  if (BrowserUtil.isChrome) {
+    window.navigation.addEventListener('navigate', navigationCallback);
+  } else { 
+    let oldHref = document.location.href;
+    const navigationObserver = new MutationObserver((_mutations, _observer) => {
+      if (oldHref !== document.location.href) {
+        oldHref = document.location.href;
+        navigationCallback();
+      }
+    });
+    navigationObserver.observe(document.body, {childList: true, subtree: true});
+    window.addEventListener('unload', () => navigationObserver.disconnect());
+  }
 }
 
 export default setupManualSubmitBtn;
