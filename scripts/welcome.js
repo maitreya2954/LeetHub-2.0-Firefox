@@ -1,6 +1,4 @@
-import { getBrowser } from "./leetcode/util";
-
-const api = getBrowser()
+const api = BrowserUtil.instance;
 
 const option = () => {
   return $('#type').val();

@@ -23,9 +23,8 @@ $('#reset_stats').on('click', () => {
     $('#reset_confirmation').hide()
   })
 });
-console.log('Browser: ', BrowserUtil.instance);
+
 BrowserUtil.instance.storage.local.get('leethub_token', data => {
-  console.log('data: ', data);
   const token = data.leethub_token;
   if (token === null || token === undefined) {
     action = true;
