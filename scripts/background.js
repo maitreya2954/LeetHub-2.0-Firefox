@@ -1,5 +1,3 @@
-
-
 let api = isChrome() ? chrome : isStandardBrowser() ? browser : undefined;
 
 api.runtime.onInstalled.addListener(details => {

@@ -193,10 +193,13 @@ const linkRepo = (token, name) => {
 
 const unlinkRepo = () => {
   /* Reset mode type to hook, stats to null */
-  api.storage.local.set({ mode_type: 'hook', leethub_hook: null, sync_stats: true, stats: null }, () => {
-    console.log(`Unlinked repo`);
-    console.log('Cleared local stats');
-  });
+  api.storage.local.set(
+    { mode_type: 'hook', leethub_hook: null, sync_stats: true, stats: null },
+    () => {
+      console.log(`Unlinked repo`);
+      console.log('Cleared local stats');
+    }
+  );
 
   /* Hide accordingly */
   document.getElementById('hook_mode').style.display = 'inherit';
@@ -214,7 +217,7 @@ $('#type').on('change', function () {
   }
 });
 
-const linkGitRepo = (e) => {
+const linkGitRepo = e => {
   /* on click should generate: 1) option 2) repository name */
   if (!option()) {
     $('#error').text(
@@ -268,7 +271,8 @@ const linkGitRepo = (e) => {
 };
 
 $('#hook_button').on('click', linkGitRepo);
-$('#name').on('keypress', (e) => { // Link repo on pressing Enter/Return
+$('#name').on('keypress', e => {
+  // Link repo on pressing Enter/Return
   if (e.which == 13) {
     linkGitRepo(e);
   }

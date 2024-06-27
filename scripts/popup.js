@@ -11,17 +11,21 @@ $('#welcome_URL').attr('href', BrowserUtil.instance.runtime.getURL('welcome.html
 $('#hook_URL').attr('href', BrowserUtil.instance.runtime.getURL('welcome.html'));
 $('#reset_stats').on('click', () => {
   $('#reset_confirmation').show();
-  $('#reset_yes').off('click').on('click', () => {
-    BrowserUtil.instance.storage.local.set({ stats: null });
-    $('#p_solved').text(0);
-    $('#p_solved_easy').text(0);
-    $('#p_solved_medium').text(0);
-    $('#p_solved_hard').text(0);
-    $('#reset_confirmation').hide()
-  })
-  $('#reset_no').off('click').on('click', () => {
-    $('#reset_confirmation').hide()
-  })
+  $('#reset_yes')
+    .off('click')
+    .on('click', () => {
+      BrowserUtil.instance.storage.local.set({ stats: null });
+      $('#p_solved').text(0);
+      $('#p_solved_easy').text(0);
+      $('#p_solved_medium').text(0);
+      $('#p_solved_hard').text(0);
+      $('#reset_confirmation').hide();
+    });
+  $('#reset_no')
+    .off('click')
+    .on('click', () => {
+      $('#reset_confirmation').hide();
+    });
 });
 
 BrowserUtil.instance.storage.local.get('leethub_token', data => {
