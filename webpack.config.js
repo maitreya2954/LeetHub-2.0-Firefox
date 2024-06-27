@@ -17,6 +17,8 @@ const ignore = [
   '**/scripts/welcome.js',
   '**/README.md',
   '**/assets/extension', // web store assets
+  '**/assets/firefox',
+  '**/assets/.DS_Store'
   // ...entries.map((entry) => `**/${entry}.js`),
 ];
 
