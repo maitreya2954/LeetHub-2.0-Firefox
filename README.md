@@ -36,7 +36,7 @@
 [![LeetHub](https://user-images.githubusercontent.com/43754306/165053510-a757c95e-c3bc-49d5-995c-7a52368abd37.png)](https://www.youtube.com/watch?v=o33PIjqlOgw "LeetHub saves lives!") -->
 
 ## What is LeetHub 2.0?
-<p>A chrome extension that automatically pushes your code to GitHub when you pass all tests on a <a href="http://leetcode.com/">Leetcode</a> problem. It's forked from the original <a href="https://chrome.google.com/webstore/detail/leethub/aciombdipochlnkbpcbgdpjffcfdbggi?hl=en">LeetHub</a> and improves on it to be faster, cleaner and compatible with the new dynamic LeetCode UI.</p>
+<p>A Firefox Addon that automatically pushes your code to GitHub when you pass all tests on a <a href="http://leetcode.com/">Leetcode</a> problem. It's forked from the original <a href="https://chromewebstore.google.com/detail/leethub-v2/mhanfgfagplhgemhjfeolkkdidbakocm?hl=en">LeetHub v2</a> and made compatible with Firefox. Shout out to <a href="https://github.com/arunbhardwaj/LeetHub-2.0">arunbhardwaj</a> and <a href="https://github.com/QasimWani/LeetHub">QasimWani</a></p>
 
 ## Why LeetHub?
 <p> <strong>1.</strong> Recruiters <em>want</em> to see your contributions to the Open Source community, be it through side projects, solving algorithms/data-structures, or contributing to existing OS projects.<br>
@@ -52,34 +52,31 @@ Moreover, pushing code manually to GitHub from Leetcode is very time consuming. 
   <li>After installation, launch LeetHub.</li>
   <li>Click on "authorize with GitHub" button to automatically set up your account with LeetHub.</li>
   <li>Setup an existing/new repository with LeetHub (private by default) by clicking "Get Started" button.</li>
-  <li>Begin Leetcoding! To view your progress, simply click on the extension!</li>
+  <li>Begin Leetcoding! To view your progress, simply click on the addon!</li>
 </ol>
 
 
-#### BONUS: Star [this repository](https://github.com/arunbhardwaj/LeetHub-2.0) for further development of features. If you want a particular feature, simply [request](https://github.com/arunbhardwaj/LeetHub-2.0/labels/feature) for it!
-
-
-## Why did I decide to work on LeetHub?
-<p>
-After the recent SVB bank closure and growing layoffs, it became clear to me that maintaining your skills is incredibly important. In that effort, it helps to have a source to contain all your learnings over the years: a repo you can go back to and see your commit history and any notes you've taken. With the previous and other extensions broken by recent LeetCode and GitHub changes, I decided to build one out myself using the original as a starting point.
-</p>
+#### BONUS: Star [this repository](https://github.com/arunbhardwaj/LeetHub-2.0) for further development of features. If you want a particular feature, simply [request](https://github.com/maitreya2954/LeetHub-2.0-Firefox/labels/feature) for it!
 
 # Let's see you ACE that coding interview!
 
 ![leetcode view](assets/extension/leetcode.png)
 
+## Why did I build Leethub 2.0 for Firefox
+
+When I started leetcoding to prepare for interviews. I wanted a way to store all my solutions. I found out about LeetHub and LeetHubV2. But being a ardent firefox user, I couldnt find a working firefox addon which does the job. So, I migrated the chrome extension to firefox.
 
 # How to set up LeetHub for local development?
 
 <ol>
   <li>Fork this repo and clone to your local machine</li>
   <li>Run "npm run setup" to install the developer dependencies</li>
-  <li>Run `npm run build` to build the final extension files into the `./dist/` directory</li>
-  <li>Go to <a href="chrome://extensions">chrome://extensions</a> </li>
-  <li>Enable <a href="https://www.mstoic.com/enable-developer-mode-in-chrome/">Developer mode</a> by toggling the switch on top right corner</li>
-  <li>Click 'Load unpacked'</li>
-  <li>Select the `./dist/` LeetHub folder</li>
-  <li>That's it! Be sure to `npm run build` and reload the extension after making changes</li>
+  <li>Run `npm run build` to build the final addon files into the `./dist/` directory</li>
+  <li>Go to <a href="about://debugging">about:debugging</a> </li>
+  <li>Click on <a>This firefox</a> present in the setup section</li> 
+  <li>Click 'Load Temporary Add-on'</li>
+  <li>Select any file in `./dist/` LeetHub folder</li>
+  <li>That's it! Be sure to `npm run build` and reload the addon after making changes</li>
 </ol>
 
 Other npm commands available:
