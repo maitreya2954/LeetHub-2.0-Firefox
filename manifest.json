@@ -41,9 +41,9 @@
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
-  "browser_specific_setings": {
+  "browser_specific_settings": {
     "gecko": {
-      "id": "leethub-2.0-for-firefox-by-siddharth-rayabharam-maitreya2954"
+      "id": "leethub-2.0-firefox-by-siddharth-rayabharam@maitreya2954"
     }
   }
 }
