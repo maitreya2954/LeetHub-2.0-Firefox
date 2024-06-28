@@ -1,7 +1,7 @@
 <h1 align="center">
   <a href="https://standardjs.com"><img src="assets/octocode.png" alt="LeetHub 2.0 - Automatically sync your code to GitHub." width="400"></a>
   <br>
-  <a href="https://chrome.google.com/webstore/detail/leethub-v2/mhanfgfagplhgemhjfeolkkdidbakocm">LeetHub 2.0</a> - Automatically sync your code to GitHub.
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/leethub-2-0-for-firefox/">LeetHub 2.0</a> - Automatically sync your code to GitHub.
   <br>
   <br>
 </h1>
