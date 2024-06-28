@@ -56,7 +56,7 @@ Moreover, pushing code manually to GitHub from Leetcode is very time consuming. 
 </ol>
 
 
-#### BONUS: Star [this repository](https://github.com/arunbhardwaj/LeetHub-2.0) for further development of features. If you want a particular feature, simply [request](https://github.com/maitreya2954/LeetHub-2.0-Firefox/labels/feature) for it!
+#### BONUS: Star [this repository](https://github.com/maitreya2954/LeetHub-2.0-Firefox) for further development of features. If you want a particular feature, simply [request](https://github.com/maitreya2954/LeetHub-2.0-Firefox/labels/feature) for it!
 
 # Let's see you ACE that coding interview!
 
