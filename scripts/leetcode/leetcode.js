@@ -106,14 +106,7 @@ const incrementStats = (difficulty) => {
   // .catch(console.error)
 };
 
-const checkAlreadyCompleted = problemName => {
-  return BrowserUtil.instance.storage.local.get('stats').then(({ stats }) => {
-    if (stats?.shas?.[problemName] == null) {
-      return false;
-    }
-    return true;
-  });
-};
+
 
 /* Main function for updating code on GitHub Repo */
 /* Read from existing file on GitHub */
