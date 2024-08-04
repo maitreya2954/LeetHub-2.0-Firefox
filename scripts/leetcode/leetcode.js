@@ -9,6 +9,7 @@ import {
   RepoReadmeNotFoundErr,
 } from './util';
 import { appendProblemToReadme, sortTopicsInReadme } from './readmeTopics';
+import { uploadOnAcceptedSubmission } from './upload';
 
 /* Commit messages */
 const readmeMsg = 'Create README - LeetHub';
@@ -89,21 +90,6 @@ const getAndInitializeStats = problem => {
 
     return stats;
   });
-};
-
-const incrementStats = (difficulty) => {
-  return BrowserUtil.instance.storage.local
-    .get('stats')
-    .then(({ stats }) => {
-      stats.solved += 1;
-      stats.easy += difficulty === DIFFICULTY.EASY ? 1 : 0;
-      stats.medium += difficulty === DIFFICULTY.MEDIUM ? 1 : 0;
-      stats.hard += difficulty === DIFFICULTY.HARD ? 1 : 0;
-      BrowserUtil.instance.storage.local.set({ stats });
-      return stats;
-    })
-    .then(uploadPersistentStats);
-  // .catch(console.error)
 };
 
 
@@ -229,21 +215,6 @@ async function getGitHubFile(token, hook, directory, filename) {
   });
 }
 
-// Updates or creates the persistent stats from local stats
-async function uploadPersistentStats(localStats) {
-  const pStats = { leetcode: localStats };
-  const pStatsEncoded = btoa(unescape(encodeURIComponent(JSON.stringify(pStats))));
-  return delay(
-    uploadGit,
-    WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS,
-    pStatsEncoded,
-    'stats.json',
-    '',
-    `Updated stats`,
-    'upload'
-  );
-}
-
 /* Discussion Link - When a user makes a new post, the link is prepended to the README for that problem.*/
 document.addEventListener('click', event => {
   const element = event.target;
@@ -275,49 +246,6 @@ document.addEventListener('click', event => {
   }
 });
 
-function createRepoReadme() {
-  const content = btoa(unescape(encodeURIComponent(defaultRepoReadme)));
-  return uploadGit(content, readmeFilename, '', readmeMsg, 'upload');
-}
-
-async function updateReadmeTopicTagsWithProblem(topicTags, problemName) {
-  if (topicTags == null) {
-    console.log(new LeetHubError('TopicTagsNotFound'));
-    return;
-  }
-
-  const { leethub_token, leethub_hook, stats } = await BrowserUtil.instance.storage.local.get([
-    'leethub_token',
-    'leethub_hook',
-    'stats',
-  ]);
-  let readme;
-  try {
-      const { content, sha } = await getGitHubFile(leethub_token, leethub_hook, readmeFilename).then(resp => resp.json());
-      readme = content;
-      stats.shas[readmeFilename] = {'': sha}
-      await BrowserUtil.instance.storage.local.set({stats})
-  } catch (err) {
-    if (err.message === '404') {
-      throw new RepoReadmeNotFoundErr('RepoReadmeNotFound', topicTags, problemName);
-    }
-
-    throw err;
-  }
-  readme = decodeURIComponent(escape(atob(readme)));
-  for (let topic of topicTags) {
-    readme = appendProblemToReadme(topic.name, readme, leethub_hook, problemName);
-  }
-  readme = sortTopicsInReadme(readme);
-  readme = btoa(unescape(encodeURIComponent(readme)));
-  return new Promise((resolve, reject) =>
-    setTimeout(
-      () => resolve(uploadGit(readme, readmeFilename, '', updateReadmeMsg, 'upload')),
-      WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS
-    )
-  );
-}
-
 function loader(leetCode) {
   let iterations = 0;
   const intervalId = setInterval(async () => {
@@ -335,100 +263,12 @@ function loader(leetCode) {
 
       // If successful, stop polling
       clearInterval(intervalId);
-
-      // For v2, query LeetCode API for submission results
-      await leetCode.init();
-
-      const probStats = leetCode.parseStats();
-      if (!probStats) {
-        throw new LeetHubError('SubmissionStatsNotFound');
-      }
-
-      const probStatement = leetCode.parseQuestion();
-      if (!probStatement) {
-        throw new LeetHubError('ProblemStatementNotFound');
-      }
-
-      const problemName = leetCode.getProblemNameSlug();
-      const alreadyCompleted = await checkAlreadyCompleted(problemName);
-      const language = leetCode.getLanguageExtension();
-      if (!language) {
-        throw new LeetHubError('LanguageNotFound');
-      }
-      const filename = problemName + language;
-
-      /* Upload README */
-      const uploadReadMe = await BrowserUtil.instance.storage.local.get('stats').then(({ stats }) => {
-        const shaExists = stats?.shas?.[problemName]?.[readmeFilename] !== undefined;
-
-        if (!shaExists) {
-          return uploadGit(
-            btoa(unescape(encodeURIComponent(probStatement))),
-            problemName,
-            readmeFilename,
-            readmeMsg,
-            'upload',
-            false
-          );
-        }
-      });
-
-      /* Upload Notes if any*/
-      const notes = leetCode.getNotesIfAny();
-      let uploadNotes;
-      if (notes != undefined && notes.length > 0) {
-        uploadNotes = uploadGit(
-          btoa(unescape(encodeURIComponent(notes))),
-          problemName,
-          'NOTES.md',
-          createNotesMsg,
-          'upload',
-          false
-        );
-      }
-
-      /* Upload code to Git */
-      const code = leetCode.findCode(probStats);
-      const uploadCode = uploadGit(
-        btoa(unescape(encodeURIComponent(code))),
-        problemName,
-        filename,
-        probStats,
-        'upload',
-        false
-      );
-
-      /* Group problem into its relevant topics */
-      const updateRepoReadMe = updateReadmeTopicTagsWithProblem(
-        leetCode.submissionData?.question?.topicTags,
-        problemName
-      );
-
-      await Promise.all([uploadReadMe, uploadNotes, uploadCode, updateRepoReadMe]);
-
+      await uploadOnAcceptedSubmission(leetCode);
       leetCode.markUploaded();
-
-      if (!alreadyCompleted) {
-        incrementStats(leetCode.difficulty); // Increments local and persistent stats
-      }
     } catch (err) {
       leetCode.markUploadFailed();
       clearInterval(intervalId);
-
-      if (!(err instanceof LeetHubError)) {
-        console.error(err);
-        return;
-      }
-
-      if (err instanceof RepoReadmeNotFoundErr) {
-        await createRepoReadme();
-        await new Promise(resolve => {
-          setTimeout(
-            () => resolve(updateReadmeTopicTagsWithProblem(err.topicTags, err.problemName)),
-            WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS
-          );
-        });
-      }
+      console.error(err);
     }
   }, 1000);
 }
