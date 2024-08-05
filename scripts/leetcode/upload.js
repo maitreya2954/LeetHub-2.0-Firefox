@@ -41,6 +41,26 @@ async function getGitHubFile(token, hook, directory, filename) {
   return getGitHubResponse(URL, options);
 }
 
+/* Upload a file to github at the given path and returns sha of uploaded file */
+async function uploadGitHubFile(token, hook, message, content, path) {
+  let data = JSON.stringify({
+    message,
+    content
+  });
+
+  const URL = `https://api.github.com/repos/${hook}/contents/${path}`;
+  const { content: { sha: newSha }} = await getGitHubResponse(URL, {
+    method: 'PUT',
+    headers: {
+      Authorization: `token ${token}`,
+      Accept: 'application/vnd.github.v3+json'
+    },
+    body: data
+  });
+
+  return newSha;
+}
+
 /* Create tree and push all the files in single commit */
 async function createTreeAndCommit(token, hook, filesToCommit, commitMsg) {
   var COMMITS_URL = `https://api.github.com/repos/${hook}/git/commits`;
@@ -191,6 +211,8 @@ async function uploadOnAcceptedSubmission(leetcode) {
     })
   }
 
+  // Create a deepcopy of stats and increment the stats for a new problem
+  // If the github upload is successfull, this copy of stats will be updated in the local storage
   let updateStats = localStats?.shas?.[problemName] === undefined;
   let tempStats = JSON.parse(JSON.stringify(localStats)) // Deep copy
   if (updateStats) {
@@ -212,8 +234,8 @@ async function uploadOnAcceptedSubmission(leetcode) {
   let commitMsg = problemName.toUpperCase() + " Stats: " + problemStats
   let commitSha = await createTreeAndCommit(token, hook, filesToCommit, commitMsg);
   tempStats.shas[problemName].sha = commitSha
-  await BrowserUtil.instance.storage.local.set({stats: tempStats});
+  await BrowserUtil.instance.storage.local.set({stats: tempStats}).then(() => {console.log(`Successfully committed ${problemName} to github`)});
   
 }
 
-export { uploadOnAcceptedSubmission }
+export { uploadOnAcceptedSubmission, uploadGitHubFile }
