@@ -36,8 +36,8 @@ const DIFFICULTY = Object.freeze({
 const FILENAMES = {
   readme: 'README.md',
   notes: 'NOTES.md',
-  stats: 'stats.json'
-}
+  stats: 'stats.json',
+};
 
 class LeetHubError extends Error {
   constructor(message) {
@@ -129,6 +129,6 @@ export {
   formatStats,
   getDifficulty,
   isEmpty,
-  languages, 
-  LeetHubError
+  languages,
+  LeetHubError,
 };

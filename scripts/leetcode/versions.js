@@ -74,12 +74,12 @@ LeetCodeV1.prototype.findCode = function (commitMsg) {
             slicedText = text.slice(text.indexOf('runtime'), text.indexOf('memory'));
             const resultRuntime = slicedText.slice(
               slicedText.indexOf("'") + 1,
-              slicedText.lastIndexOf("'"),
+              slicedText.lastIndexOf("'")
             );
             slicedText = text.slice(text.indexOf('memory'), text.indexOf('total_correct'));
             const resultMemory = slicedText.slice(
               slicedText.indexOf("'") + 1,
-              slicedText.lastIndexOf("'"),
+              slicedText.lastIndexOf("'")
             );
             commitMsg = `Time: ${resultRuntime}, Memory: ${resultMemory} - LeetHub`;
           }
@@ -118,9 +118,7 @@ LeetCodeV1.prototype.getNotesIfAny = function () {
   if (
     checkElem(document.getElementsByClassName('notewrap__eHkN')) &&
     checkElem(
-      document
-        .getElementsByClassName('notewrap__eHkN')[0]
-        .getElementsByClassName('CodeMirror-code'),
+      document.getElementsByClassName('notewrap__eHkN')[0].getElementsByClassName('CodeMirror-code')
     )
   ) {
     let notesdiv = document
@@ -403,7 +401,7 @@ LeetCodeV2.prototype.parseStats = function () {
       this.submissionData.runtimeDisplay,
       runtimePercentile,
       this.submissionData.memoryDisplay,
-      spacePercentile,
+      spacePercentile
     );
   }
 
