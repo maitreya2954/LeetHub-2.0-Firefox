@@ -40,14 +40,6 @@ class LeetHubError extends Error {
   }
 }
 
-class RepoReadmeNotFoundErr extends LeetHubError {
-  constructor(message, topicTags, problemName) {
-    super(message);
-    this.topicTags = topicTags;
-    this.problemName = problemName;
-  }
-}
-
 function isEmpty(obj) {
   for (const prop in obj) {
     if (Object.hasOwn(obj, prop)) {
@@ -130,7 +122,6 @@ export {
   formatStats,
   getDifficulty,
   isEmpty,
-  languages,
-  LeetHubError,
-  RepoReadmeNotFoundErr,
+  languages, 
+  LeetHubError
 };

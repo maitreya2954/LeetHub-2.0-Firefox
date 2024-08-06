@@ -15,10 +15,20 @@ const getPath = (problem, filename) => {
 
 // TO DO: create encode and decode functions
 
+function decode(content) {return decodeURIComponent(escape(content))}
+
+function encode(content) {return unescape(encodeURIComponent(content))}
+
+function decode_base64(content) {return decodeURIComponent(escape(atob(content)))}
+
+function encode_base64(content) {return btoa(unescape(encodeURIComponent(content)))}
+
 async function getGitHubResponse(URL, options) {
   return fetch(URL, options).then(res => {
     if (!res.ok) {
-      throw new Error(res.status);
+      // using window.Error is a workaround to avoid promise rejection being wrapped by 
+      // generic error object, which is not useful for us.
+      throw new window.Error(res.status); 
     }
     return res;
   }).then((res) => {return res.json()}).catch(err => {
@@ -42,7 +52,8 @@ async function getGitHubFile(token, hook, directory, filename) {
 }
 
 /* Upload a file to github at the given path and returns sha of uploaded file */
-async function uploadGitHubFile(token, hook, message, content, path) {
+async function uploadGitHubFile(token, hook, message, content, directory, filename) {
+  const path = getPath(directory, filename);
   let data = JSON.stringify({
     message,
     content
@@ -61,7 +72,7 @@ async function uploadGitHubFile(token, hook, message, content, path) {
   return newSha;
 }
 
-/* Create tree and push all the files in single commit */
+/* Create tree and push all the files in single commit (utf-8 encoded) */
 async function createTreeAndCommit(token, hook, filesToCommit, commitMsg) {
   var COMMITS_URL = `https://api.github.com/repos/${hook}/git/commits`;
   var REPO_TREE_URL = `https://api.github.com/repos/${hook}/git/trees`;
@@ -165,7 +176,7 @@ async function uploadOnAcceptedSubmission(leetcode) {
   if (localStats?.shas?.[problemName]?.[FILENAMES.readme] === undefined) {
     filesToCommit.push({
       path: getPath(problemName, FILENAMES.readme),
-      content: btoa(unescape(encodeURIComponent(problemStatement)))
+      content: encode(problemStatement)
     })
   }
 
@@ -174,7 +185,7 @@ async function uploadOnAcceptedSubmission(leetcode) {
   if (notes != undefined && notes.length > 0) {
     filesToCommit.push({
       path: getPath(problemName, FILENAMES.notes),
-      content: btoa(unescape(encodeURIComponent(notes)))
+      content: encode(notes)
     })
   }
 
@@ -182,7 +193,7 @@ async function uploadOnAcceptedSubmission(leetcode) {
   let code = leetcode.findCode(problemStats);
   filesToCommit.push({
     path: getPath(problemName, filename),
-    content: btoa(unescape(encodeURIComponent(code)))
+    content: encode(code)
   })
 
   // Update repo README file, grouping problem into its relevant topics
@@ -193,7 +204,7 @@ async function uploadOnAcceptedSubmission(leetcode) {
     try {
       const { content, sha } = await getGitHubFile(token, hook, FILENAMES.readme);
       localStats.shas[FILENAMES.readme] = { '': sha };
-      readme = decodeURIComponent(escape(atob(content)));
+      readme = decode(content);
     } catch (error) {
       if (error.message === '404') { // README not found
         readme = defaultRepoReadme
@@ -207,7 +218,7 @@ async function uploadOnAcceptedSubmission(leetcode) {
     readme = sortTopicsInReadme(readme);
     filesToCommit.push({
       path: getPath(FILENAMES.readme, undefined),
-      content: btoa(unescape(encodeURIComponent(readme)))
+      content: encode(readme)
     })
   }
 
@@ -227,7 +238,7 @@ async function uploadOnAcceptedSubmission(leetcode) {
     }
     filesToCommit.push({
       path: getPath(FILENAMES.stats),
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(tempStats))))
+      content: encode(JSON.stringify({ leetcode: tempStats }))
     })
   }
 
@@ -238,4 +249,4 @@ async function uploadOnAcceptedSubmission(leetcode) {
   
 }
 
-export { uploadOnAcceptedSubmission, uploadGitHubFile }
+export { uploadOnAcceptedSubmission, uploadGitHubFile, decode_base64, encode_base64 }
