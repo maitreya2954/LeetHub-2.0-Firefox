@@ -2,14 +2,10 @@ import { LeetCodeV1, LeetCodeV2 } from './versions';
 import setupManualSubmitBtn from './submitBtn';
 import {
   debounce,
-  delay,
-  DIFFICULTY,
   isEmpty,
   LeetHubError,
-  RepoReadmeNotFoundErr,
 } from './util';
-import { appendProblemToReadme, sortTopicsInReadme } from './readmeTopics';
-import { uploadOnAcceptedSubmission } from './upload';
+import { uploadOnAcceptedSubmission, uploadGitHubFile, decode_base64, encode_base64 } from './upload';
 
 /* Commit messages */
 const readmeMsg = 'Create README - LeetHub';
@@ -194,27 +190,6 @@ function uploadGit(
   // .catch(e => console.error(new LeetHubError(e.message)));
 }
 
-/* Returns GitHub data for the file specified by `${directory}/${filename}` path */
-async function getGitHubFile(token, hook, directory, filename) {
-  const path = getPath(directory, filename);
-  const URL = `https://api.github.com/repos/${hook}/contents/${path}`;
-
-  let options = {
-    method: 'GET',
-    headers: {
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github.v3+json',
-    },
-  };
-
-  return fetch(URL, options).then(res => {
-    if (!res.ok) {
-      throw new Error(res.status);
-    }
-    return res;
-  });
-}
-
 /* Discussion Link - When a user makes a new post, the link is prepended to the README for that problem.*/
 document.addEventListener('click', event => {
   const element = event.target;
@@ -239,8 +214,24 @@ document.addEventListener('click', event => {
         const currentDate = `${date.getDate()}/${date.getMonth()}/${date.getFullYear()} at ${date.getHours()}:${date.getMinutes()}`;
         const addition = `[Discussion Post (created on ${currentDate})](${window.location})  \n`;
         const problemName = window.location.pathname.split('/')[2]; // must be true.
-
-        uploadGit(addition, problemName, readmeFilename, discussionMsg, 'update', true);
+        
+        BrowserUtil.instance.storage.local
+        .get(['leethub_token', 'leethub_hook'])
+        .then(({ leethub_token, leethub_hook }) => {
+          if (!leethub_token) {
+            throw new LeetHubError('LeethubTokenUndefined');
+          }
+          if (!leethub_hook) {
+            throw new LeetHubError('NoRepoDefined');
+          }
+          getGitHubFile(leethub_token, leethub_hook, readmeFilename)
+          .then((data) => {
+            let existingContent = decode_base64(data);
+            let uploadContent = encode_base64(addition + existingContent);
+            // Append discussion post link to current readme file and upload to github
+            uploadGitHubFile(leethub_token, leethub_hook, discussionMsg, uploadContent, problemName, readmeFilename);
+          })
+        });
       }
     }, 1000);
   }
