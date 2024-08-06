@@ -92,6 +92,10 @@ function setupManualSubmitBtn(submitBtnHandler) {
     });
     navigationObserver.observe(document.body, {childList: true, subtree: true});
     window.addEventListener('unload', () => navigationObserver.disconnect());
+
+    // Handle submission URL reload. Because navigationObserver will never trigger
+    // navigationCallback because oldHref === location.href for a reload
+    navigationCallback();
   }
 }
 
