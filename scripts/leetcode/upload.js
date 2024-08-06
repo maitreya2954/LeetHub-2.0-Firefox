@@ -1,11 +1,5 @@
 import { appendProblemToReadme, sortTopicsInReadme } from "./readmeTopics";
-import { DIFFICULTY, LeetHubError, getDifficulty } from "./util";
-
-const FILENAMES = {
-  readme: 'README.md',
-  notes: 'NOTES.md',
-  stats: 'stats.json'
-}
+import { DIFFICULTY, LeetHubError, getDifficulty, FILENAMES } from "./util";
 
 const defaultRepoReadme = 'A collection of LeetCode questions to ace the coding interviews! - Created using [LeetHub 2.0 for Firefox](https://github.com/maitreya2954/LeetHub-2.0-Firefox)'
 

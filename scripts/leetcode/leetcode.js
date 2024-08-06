@@ -4,191 +4,9 @@ import {
   debounce,
   isEmpty,
   LeetHubError,
+  FILENAMES
 } from './util';
 import { uploadOnAcceptedSubmission, uploadGitHubFile, decode_base64, encode_base64 } from './upload';
-
-/* Commit messages */
-const readmeMsg = 'Create README - LeetHub';
-const updateReadmeMsg = 'Update README - Topic Tags';
-const discussionMsg = 'Prepend discussion post - LeetHub';
-const createNotesMsg = 'Attach NOTES - LeetHub';
-const defaultRepoReadme =
-  'A collection of LeetCode questions to ace the coding interview! - Created using [LeetHub v2](https://github.com/maitreya2954/LeetHub-2.0-Firefox)';
-const readmeFilename = 'README.md';
-
-// problem types
-const NORMAL_PROBLEM = 0;
-const EXPLORE_SECTION_PROBLEM = 1;
-
-const WAIT_FOR_GITHUB_API_TO_NOT_THROW_409_MS = 1500;
-
-const api = BrowserUtil.instance;
-
-const getPath = (problem, filename) => {
-  return filename ? `${problem}/${filename}` : problem;
-};
-
-/* Main function for uploading code to GitHub repo, and callback cb is called if success */
-const upload = (token, hook, content, problem, filename, sha, message) => {
-  const path = getPath(problem, filename);
-  const URL = `https://api.github.com/repos/${hook}/contents/${path}`;
-  
-  let data = {
-    message,
-    content,
-    sha,
-  };
-
-  data = JSON.stringify(data);
-
-  let options = {
-    method: 'PUT',
-    headers: {
-      Authorization: `token ${token}`,
-      Accept: 'application/vnd.github.v3+json',
-    },
-    body: data,
-  };
-  let newSha;
-
-  return fetch(URL, options)
-    .then(res => {
-      if (!res.ok) {
-        throw new LeetHubError(res.status, res);
-        // throw new LeetHubError('File already exists with GitHub. Updating instead.');
-      }
-      return res.json();
-    })
-    .then(async body => {
-      newSha = body.content.sha;
-      const stats = await getAndInitializeStats(problem);
-      stats.shas[problem][filename] = newSha;
-      return BrowserUtil.instance.storage.local.set({ stats });
-    })
-    .then(() => console.log(`Successfully committed ${getPath(problem, filename)} to github`));
-};
-
-// Returns stats object. If it didn't exist, initializes stats with default difficulty values and initializes the sha object for problem
-const getAndInitializeStats = problem => {
-  return BrowserUtil.instance.storage.local.get('stats').then(({ stats }) => {
-    if (stats == null || isEmpty(stats)) {
-      stats = {};
-      stats.shas = {};
-      stats.solved = 0;
-      stats.easy = 0;
-      stats.medium = 0;
-      stats.hard = 0;
-    }
-
-    if (stats.shas[problem] == null) {
-      stats.shas[problem] = {};
-    }
-
-    return stats;
-  });
-};
-
-
-
-/* Main function for updating code on GitHub Repo */
-/* Read from existing file on GitHub */
-/* Discussion posts prepended at top of README */
-/* Future implementations may require appending to bottom of file */
-const update = (
-  token,
-  hook,
-  addition,
-  directory,
-  filename,
-  commitMsg,
-  shouldPreprendDiscussionPosts
-) => {
-  let responseSHA;
-
-  return getGitHubFile(token, hook, directory, filename)
-    .then(resp => resp.json())
-    .then(data => {
-      responseSHA = data.sha;
-      return decodeURIComponent(escape(atob(data.content)));
-    })
-    .then(existingContent =>
-      // https://web.archive.org/web/20190623091645/https://monsur.hossa.in/2012/07/20/utf-8-in-javascript.html
-      // In order to preserve mutation of the data, we have to encode it, which is usually done in base64.
-      // But btoa only accepts ASCII 7 bit chars (0-127) while Javascript uses 16-bit minimum chars (0-65535).
-      // EncodeURIComponent converts the Unicode Points UTF-8 bits to hex UTF-8.
-      // Unescape converts percent-encoded hex values into regular ASCII (optional; it shrinks string size).
-      // btoa converts ASCII to base64.
-      shouldPreprendDiscussionPosts
-        ? btoa(unescape(encodeURIComponent(addition + existingContent)))
-        : btoa(unescape(encodeURIComponent(existingContent)))
-    )
-    .then(newContent =>
-      upload(token, hook, newContent, directory, filename, responseSHA, commitMsg)
-    );
-};
-
-function uploadGit(
-  code,
-  problemName,
-  fileName,
-  commitMsg,
-  action,
-  shouldPrependDiscussionPosts = false
-) {
-  let token;
-  let hook;
-
-  return BrowserUtil.instance.storage.local
-    .get(['leethub_token', 'mode_type', 'leethub_hook', 'stats'])
-    .then(({ leethub_token, leethub_hook, mode_type, stats }) => {
-      token = leethub_token;
-      if (leethub_token == undefined) {
-        throw new LeetHubError('LeethubTokenUndefined');
-      }
-
-      if (mode_type !== 'commit') {
-        throw new LeetHubError('LeetHubNotAuthorizedByGit');
-      }
-
-      hook = leethub_hook;
-      if (!hook) {
-        throw new LeetHubError('NoRepoDefined');
-      }
-      if (action === 'upload') {
-        /* Get SHA, if it exists */
-        const sha =
-          stats?.shas?.[problemName]?.[fileName] !== undefined
-            ? stats.shas[problemName][fileName]
-            : '';
-
-        return upload(token, hook, code, problemName, fileName, sha, commitMsg);
-      } else if (action === 'update') {
-        return update(
-          token,
-          hook,
-          code,
-          problemName,
-          fileName,
-          commitMsg,
-          shouldPrependDiscussionPosts
-        );
-      }
-    })
-    .catch(err => {
-      // if (err instanceof LeetHubError) {
-      if (err.message === '409') {
-        return getGitHubFile(token, hook, problemName, fileName).then(resp => resp.json());
-      } else {
-        throw err;
-      }
-    })
-    .then(data =>
-      data != null // if it isn't null, then we didn't upload successfully the first time, and must have retrieved new data and reuploaded
-        ? upload(token, hook, code, problemName, fileName, data.sha, commitMsg)
-        : undefined
-    );
-  // .catch(e => console.error(new LeetHubError(e.message)));
-}
 
 /* Discussion Link - When a user makes a new post, the link is prepended to the README for that problem.*/
 document.addEventListener('click', event => {
@@ -224,12 +42,12 @@ document.addEventListener('click', event => {
           if (!leethub_hook) {
             throw new LeetHubError('NoRepoDefined');
           }
-          getGitHubFile(leethub_token, leethub_hook, readmeFilename)
+          getGitHubFile(leethub_token, leethub_hook, FILENAMES.readme)
           .then((data) => {
             let existingContent = decode_base64(data);
             let uploadContent = encode_base64(addition + existingContent);
             // Append discussion post link to current readme file and upload to github
-            uploadGitHubFile(leethub_token, leethub_hook, discussionMsg, uploadContent, problemName, readmeFilename);
+            uploadGitHubFile(leethub_token, leethub_hook, 'Prepend discussion post - LeetHub', uploadContent, problemName, FILENAMES.readme);
           })
         });
       }

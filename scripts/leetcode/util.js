@@ -33,6 +33,12 @@ const DIFFICULTY = Object.freeze({
   UNKNOWN: 'Unknown',
 });
 
+const FILENAMES = {
+  readme: 'README.md',
+  notes: 'NOTES.md',
+  stats: 'stats.json'
+}
+
 class LeetHubError extends Error {
   constructor(message) {
     super(message);
@@ -118,6 +124,7 @@ export {
   convertToSlug,
   debounce,
   delay,
+  FILENAMES,
   DIFFICULTY,
   formatStats,
   getDifficulty,
