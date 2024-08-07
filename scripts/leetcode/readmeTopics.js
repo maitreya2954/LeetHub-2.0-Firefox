@@ -1,4 +1,4 @@
-import { LeetHubError } from "./util";
+import { LeetHubError } from './util';
 
 const leetCodeSectionStart = `<!---LeetCode Topics Start-->`;
 const leetCodeSectionHeader = `# LeetCode Topics`;
@@ -21,12 +21,12 @@ function appendProblemToReadme(topic, markdownFile, hook, problem) {
   // Get LeetCode section and the Before & After sections
   const beforeSection = markdownFile.slice(0, markdownFile.indexOf(leetCodeSectionStart));
   const afterSection = markdownFile.slice(
-    markdownFile.indexOf(leetCodeSectionEnd) + leetCodeSectionEnd.length,
+    markdownFile.indexOf(leetCodeSectionEnd) + leetCodeSectionEnd.length
   );
 
   let leetCodeSection = markdownFile.slice(
     markdownFile.indexOf(leetCodeSectionStart) + leetCodeSectionStart.length,
-    markdownFile.indexOf(leetCodeSectionEnd),
+    markdownFile.indexOf(leetCodeSectionEnd)
   );
 
   // Check if topic table exists, or add it
@@ -38,7 +38,8 @@ function appendProblemToReadme(topic, markdownFile, hook, problem) {
 
   // Get the Topic table. If topic table was just added, then its end === LeetCode Section end
   const endTopicString = leetCodeSection.slice(topicTableIndex).match(/\|\n[^|]/)?.[0];
-  const endTopicIndex = (endTopicString != null) ? leetCodeSection.indexOf(endTopicString, topicTableIndex + 1) : -1;
+  const endTopicIndex =
+    endTopicString != null ? leetCodeSection.indexOf(endTopicString, topicTableIndex + 1) : -1;
   let topicTable =
     endTopicIndex === -1
       ? leetCodeSection.slice(topicTableIndex)
@@ -75,15 +76,14 @@ function appendProblemToReadme(topic, markdownFile, hook, problem) {
 function sortTopicsInReadme(markdownFile) {
   let beforeSection = markdownFile.slice(0, markdownFile.indexOf(leetCodeSectionStart));
   const afterSection = markdownFile.slice(
-    markdownFile.indexOf(leetCodeSectionEnd) + leetCodeSectionEnd.length,
+    markdownFile.indexOf(leetCodeSectionEnd) + leetCodeSectionEnd.length
   );
 
   // Matches any text between the start and end tags. Should never fail to match.
   const leetCodeSection = markdownFile.match(
-    new RegExp(`${leetCodeSectionStart}([\\s\\S]*)${leetCodeSectionEnd}`),
+    new RegExp(`${leetCodeSectionStart}([\\s\\S]*)${leetCodeSectionEnd}`)
   )?.[1];
   if (leetCodeSection == null) throw new LeetHubError('LeetCodeTopicSectionNotFound');
-  
 
   // Remove the header
   let topics = leetCodeSection.trim().split('## ');

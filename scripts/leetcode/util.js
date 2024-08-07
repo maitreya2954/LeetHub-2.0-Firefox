@@ -33,18 +33,16 @@ const DIFFICULTY = Object.freeze({
   UNKNOWN: 'Unknown',
 });
 
+const FILENAMES = {
+  readme: 'README.md',
+  notes: 'NOTES.md',
+  stats: 'stats.json',
+};
+
 class LeetHubError extends Error {
   constructor(message) {
     super(message);
     this.name = 'LeetHubErr';
-  }
-}
-
-class RepoReadmeNotFoundErr extends LeetHubError {
-  constructor(message, topicTags, problemName) {
-    super(message);
-    this.topicTags = topicTags;
-    this.problemName = problemName;
   }
 }
 
@@ -126,11 +124,11 @@ export {
   convertToSlug,
   debounce,
   delay,
+  FILENAMES,
   DIFFICULTY,
   formatStats,
   getDifficulty,
   isEmpty,
   languages,
   LeetHubError,
-  RepoReadmeNotFoundErr,
 };
