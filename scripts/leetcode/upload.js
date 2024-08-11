@@ -44,7 +44,7 @@ async function getGitHubResponse(URL, options) {
     });
 }
 
-/* Returns GitHub data for the file specified by `${directory}/${filename}` path */
+/* Returns GitHub data for the file (as Base64) specified by `${directory}/${filename}` path */
 async function getGitHubFile(token, hook, directory, filename) {
   const path = getPath(directory, filename);
   const URL = `https://api.github.com/repos/${hook}/contents/${path}`;
@@ -220,7 +220,7 @@ async function uploadOnAcceptedSubmission(leetcode) {
     try {
       const { content, sha } = await getGitHubFile(token, hook, FILENAMES.readme);
       localStats.shas[FILENAMES.readme] = { '': sha };
-      readme = decode(content);
+      readme = decode_base64(content);
     } catch (error) {
       if (error.message === '404') {
         // README not found
