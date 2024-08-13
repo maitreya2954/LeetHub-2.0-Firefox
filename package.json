@@ -1,6 +1,6 @@
 {
   "name": "LeetHub 2.0",
-  "version": "2.0.10",
+  "version": "2.0.11",
   "private": true,
   "description": "Automatically integrate your code with LeetCode and GitHub",
   "scripts": {
