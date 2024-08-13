@@ -1,5 +1,5 @@
 import { appendProblemToReadme, sortTopicsInReadme } from './readmeTopics';
-import { DIFFICULTY, LeetHubError, getDifficulty, FILENAMES } from './util';
+import { DIFFICULTY, LeetHubError, getDifficulty, FILENAMES, isEmpty } from './util';
 
 const defaultRepoReadme =
   'A collection of LeetCode questions to ace the coding interviews! - Created using [LeetHub 2.0 for Firefox](https://github.com/maitreya2954/LeetHub-2.0-Firefox)';
@@ -165,7 +165,16 @@ async function uploadOnAcceptedSubmission(leetcode) {
         throw new LeetHubError('NoRepoDefined');
       }
       hook = leethub_hook;
-      localStats = stats;
+      if (stats === undefined || isEmpty(stats)) {
+        localStats = {};
+        localStats.shas = {};
+        localStats.solved = 0;
+        localStats.easy = 0;
+        localStats.medium = 0;
+        localStats.hard = 0;
+      } else {
+        localStats = stats;
+      }
     });
   await leetcode.init();
 
@@ -225,6 +234,8 @@ async function uploadOnAcceptedSubmission(leetcode) {
       if (error.message === '404') {
         // README not found
         readme = defaultRepoReadme;
+      } else {
+        throw error;
       }
     }
 
