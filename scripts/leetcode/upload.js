@@ -86,7 +86,8 @@ async function uploadGitHubFile(token, hook, message, content, directory, filena
 async function createTreeAndCommit(token, hook, filesToCommit, commitMsg) {
   var COMMITS_URL = `https://api.github.com/repos/${hook}/git/commits`;
   var REPO_TREE_URL = `https://api.github.com/repos/${hook}/git/trees`;
-  var REF_URL = `https://api.github.com/repos/${hook}/git/refs/heads/main`;
+  var MAIN_REF_URL = `https://api.github.com/repos/${hook}/git/refs/heads/main`;
+  var MASTER_REF_URL = `https://api.github.com/repos/${hook}/git/refs/heads/master`;
   var HEADERS = {
     Authorization: `token ${token}`,
     Accept: 'application/vnd.github.v3+json',
@@ -94,13 +95,31 @@ async function createTreeAndCommit(token, hook, filesToCommit, commitMsg) {
   const filemode = '100644';
   const filetype = 'blob';
 
-  // Get the sha of the last commit on main branch
+  // Get the sha of the last commit on main/master branch
+  let ref_info;
+  let REF_URL;
+  try {
+    ref_info = await getGitHubResponse(MAIN_REF_URL, {
+      method: 'GET',
+      headers: HEADERS,
+    });
+    REF_URL = MAIN_REF_URL;
+  } catch(err) {
+    if (err.message === '404') {
+      // Handles old repos with master branch
+      console.info("Main branch not found. Looking for master branch ref.");
+      ref_info = await getGitHubResponse(MASTER_REF_URL, {
+        method: 'GET',
+        headers: HEADERS,
+      });
+      REF_URL = MASTER_REF_URL;
+    } else {
+      throw err;
+    }
+  }
   const {
     object: { sha: currentCommitSha },
-  } = await getGitHubResponse(REF_URL, {
-    method: 'GET',
-    headers: HEADERS,
-  });
+  } = ref_info;
 
   // Get the SHA of the root tree of the last commit
   const currentCommitUrl = `${COMMITS_URL}/${currentCommitSha}`;
