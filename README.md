@@ -60,7 +60,7 @@ Moreover, pushing code manually to GitHub from Leetcode is very time consuming. 
 
 # Let's see you ACE that coding interview!
 
-![leetcode view](assets/extension/leetcode.png)
+![leetcode view](assets/extension/leetcode_updated.png)
 
 ## Why did I build Leethub 2.0 for Firefox
 
