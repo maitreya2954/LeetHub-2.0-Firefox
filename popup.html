@@ -17,11 +17,9 @@
       <div class="sixteen wide center aligned column">
         <h1 id="title">Leet<span style="color: #ff6c0a">Hub</span> 2.0</h1>
         <p id="caption">Sync your code from LeetCode to GitHub</p>
-        <br />
         <!-- Authentication mode -->
         <div id="auth_mode" hidden>
           <p class="onboarding">
-            <br />
             Authenticate with GitHub to use
             <strong>Leet<span style="color: #ff6c0a">Hub</span></strong>
           </p>
@@ -43,9 +41,6 @@
             Set up Hook
           </a>
         </div>
-        <div>
-          <canvas id="difficultyChart" width="400" height="400"></canvas>
-        </div>
         <!-- Commit mode -->
         <div id="commit_mode" hidden>
           <p id="repo_url" class="ui small header"></p>
@@ -58,6 +53,9 @@
             <span style="color: #d9534f">&ensp; &ensp; Hard:</span>
             <span id="p_solved_hard" style="color: #000000; opacity: 0.75">0 </span>
           </p>
+          <div class="chart-container">
+            <canvas id="difficultyChart" width="220" height="220"></canvas>
+          </div>
           <button id="reset_stats" type="button">Reset all stats</button>
           <div
             id="reset_confirmation"

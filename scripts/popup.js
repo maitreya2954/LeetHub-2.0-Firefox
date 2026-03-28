@@ -39,6 +39,48 @@ function updateStats(total, easy, medium, hard) {
   }
 }
 
+function initializeChart() {
+  if (window.myPieChart) {
+    return window.myPieChart;
+  }
+
+  const canvas = document.getElementById('difficultyChart');
+  if (!canvas) {
+    console.error('Canvas element not found!');
+    return null;
+  }
+
+  const ctx = canvas.getContext('2d');
+  window.myPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+      labels: ['Easy', 'Medium', 'Hard'],
+      datasets: [
+        {
+          data: [0, 0, 0],
+          backgroundColor: ['#4d79ff', '#f0ad4e', '#d9534f'],
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            boxWidth: 10,
+            boxHeight: 10,
+            padding: 8,
+            font: {
+              size: 11,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return window.myPieChart;
+}
+
 // Load user authentication
 BrowserUtil.instance.storage.local.get('leethub_token', data => {
   const token = data.leethub_token;
@@ -55,6 +97,7 @@ BrowserUtil.instance.storage.local.get('leethub_token', data => {
           BrowserUtil.instance.storage.local.get('mode_type', data2 => {
             if (data2 && data2.mode_type === 'commit') {
               $('#commit_mode').show();
+              initializeChart();
               BrowserUtil.instance.storage.local.get(['stats', 'leethub_hook'], data3 => {
                 const stats = data3?.stats || { solved: 0, easy: 0, medium: 0, hard: 0 };
                 updateStats(stats.solved, stats.easy, stats.medium, stats.hard);
@@ -82,33 +125,4 @@ BrowserUtil.instance.storage.local.get('leethub_token', data => {
     xhr.setRequestHeader('Authorization', `token ${token}`);
     xhr.send();
   }
-});
-
-// Add Pie Chart using Chart.js
-$(document).ready(() => {
-  const ctx = document.getElementById('difficultyChart').getContext('2d');
-
-  if (!ctx) {
-    console.error('Canvas element not found!');
-    return;
-  }
-
-  window.myPieChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-      labels: ['Easy', 'Medium', 'Hard'],
-      datasets: [
-        {
-          data: [0, 0, 0], // Initial values
-          backgroundColor: ['#4d79ff', '#f0ad4e', '#d9534f'],
-        },
-      ],
-    },
-  });
-
-  // Ensure stats are loaded and reflected in the pie chart
-  BrowserUtil.instance.storage.local.get('stats', data => {
-    const stats = data?.stats || { easy: 0, medium: 0, hard: 0 };
-    updateStats(stats.easy + stats.medium + stats.hard, stats.easy, stats.medium, stats.hard);
-  });
 });
