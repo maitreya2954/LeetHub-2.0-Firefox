@@ -104,10 +104,10 @@ async function createTreeAndCommit(token, hook, filesToCommit, commitMsg) {
       headers: HEADERS,
     });
     REF_URL = MAIN_REF_URL;
-  } catch(err) {
+  } catch (err) {
     if (err.message === '404') {
       // Handles old repos with master branch
-      console.info("Main branch not found. Looking for master branch ref.");
+      console.info('Main branch not found. Looking for master branch ref.');
       ref_info = await getGitHubResponse(MASTER_REF_URL, {
         method: 'GET',
         headers: HEADERS,
