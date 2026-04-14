@@ -297,4 +297,158 @@ async function uploadOnAcceptedSubmission(leetcode) {
   });
 }
 
-export { uploadOnAcceptedSubmission, uploadGitHubFile, decode_base64, encode_base64 };
+/**
+ * Upload GeeksForGeeks problem solution to GitHub
+ * @param {Object} gfgData - GFG problem data
+ * @param {string} gfgData.title - Problem title
+ * @param {string} gfgData.code - Solution code
+ * @param {string} gfgData.problemStatement - Problem description (HTML)
+ * @param {string} gfgData.difficulty - Problem difficulty (Easy/Medium/Hard)
+ * @param {string} gfgData.language - File extension (e.g., '.py')
+ */
+async function uploadGFGProblem(gfgData) {
+  let token, hook, localStats;
+
+  // Validate input data
+  if (!gfgData || !gfgData.title || !gfgData.code || !gfgData.language) {
+    throw new LeetHubError('InvalidGFGData');
+  }
+
+  // Get token, hook, and stats from storage
+  await BrowserUtil.instance.storage.local
+    .get(['leethub_token', 'mode_type', 'leethub_hook', 'stats'])
+    .then(({ leethub_token, leethub_hook, mode_type, stats }) => {
+      if (!leethub_token) {
+        throw new LeetHubError('LeethubTokenUndefined');
+      }
+      token = leethub_token;
+
+      if (mode_type !== 'commit') {
+        throw new LeetHubError('LeetHubNotAuthorizedByGit');
+      }
+
+      if (!leethub_hook) {
+        throw new LeetHubError('NoRepoDefined');
+      }
+      hook = leethub_hook;
+
+      // Initialize or update stats
+      if (stats === undefined || isEmpty(stats)) {
+        localStats = {
+          shas: {},
+          solved: 0,
+          easy: 0,
+          medium: 0,
+          hard: 0,
+        };
+      } else {
+        localStats = stats;
+      }
+    });
+
+  // Format problem name (GFG format: "title - GFG")
+  const gfgProblemName = `${gfgData.title} - GFG`;
+  const filename = gfgData.language;
+  const filesToCommit = [];
+
+  // Add problem README file (only if not already created)
+  if (localStats?.shas?.[gfgProblemName]?.[FILENAMES.readme] === undefined) {
+    filesToCommit.push({
+      path: getPath(gfgProblemName, FILENAMES.readme),
+      content: encode(gfgData.problemStatement),
+    });
+  }
+
+  // Add code file
+  filesToCommit.push({
+    path: getPath(gfgProblemName, `solution${filename}`),
+    content: encode(gfgData.code),
+  });
+
+  // Update main README with GFG problem
+  let readme;
+  try {
+    const { content, sha } = await getGitHubFile(token, hook, FILENAMES.readme);
+    localStats.shas[FILENAMES.readme] = { '': sha };
+    readme = decode_base64(content);
+  } catch (error) {
+    if (error.message === '404') {
+      // README not found, create default
+      readme = defaultRepoReadme;
+    } else {
+      throw error;
+    }
+  }
+
+  // Add GFG problem to README (simple section marker approach)
+  const gfgSectionStart = `<!---GeeksForGeeks Start-->`;
+  const gfgSectionHeader = `# GeeksForGeeks Problems`;
+  const gfgSectionEnd = `<!---GeeksForGeeks End-->`;
+
+  // Check if GFG section exists, if not add it
+  if (!readme.includes(gfgSectionStart)) {
+    readme += `\n\n${gfgSectionStart}\n${gfgSectionHeader}\n| Problem | Difficulty |\n| ------- | ---------- |\n${gfgSectionEnd}`;
+  }
+
+  // Add problem to GFG section if not already there
+  const url = `https://github.com/${hook}/tree/master/${gfgProblemName}`;
+  const newRow = `| [${gfgData.title}](${url}) | ${gfgData.difficulty} |`;
+
+  if (!readme.includes(gfgData.title)) {
+    // Insert new row before end marker
+    readme = readme.replace(
+      gfgSectionEnd,
+      `${newRow}\n${gfgSectionEnd}`
+    );
+  }
+
+  filesToCommit.push({
+    path: getPath(FILENAMES.readme, undefined),
+    content: encode(readme),
+  });
+
+  // Update stats if this is a new problem
+  let updateStats = localStats?.shas?.[gfgProblemName] === undefined;
+  let tempStats = JSON.parse(JSON.stringify(localStats)); // Deep copy
+
+  if (updateStats) {
+    const diff = getDifficulty(gfgData.difficulty);
+    tempStats.solved += 1;
+    tempStats.easy += diff === DIFFICULTY.EASY ? 1 : 0;
+    tempStats.medium += diff === DIFFICULTY.MEDIUM ? 1 : 0;
+    tempStats.hard += diff === DIFFICULTY.HARD ? 1 : 0;
+    tempStats.shas[gfgProblemName] = {
+      sha: '',
+      difficulty: diff.toLowerCase(),
+      platform: 'geeksforgeeks',
+    };
+
+    // Write combined stats to GitHub
+    // This includes both LeetCode and GeeksForGeeks problems
+    filesToCommit.push({
+      path: getPath(FILENAMES.stats),
+      content: encode(JSON.stringify({ 
+        leetcode: tempStats,
+        geeksforgeeks: tempStats,
+        combined: {
+          solved: tempStats.solved,
+          easy: tempStats.easy,
+          medium: tempStats.medium,
+          hard: tempStats.hard
+        }
+      })),
+    });
+  }
+
+  // Commit all files
+  const commitMsg = `Add solution - ${gfgData.title} - GeeksForGeeks - LeetHub`;
+  const commitSha = await createTreeAndCommit(token, hook, filesToCommit, commitMsg);
+
+  // Update stats with commit SHA
+  tempStats.shas[gfgProblemName].sha = commitSha;
+  await BrowserUtil.instance.storage.local.set({ stats: tempStats }).then(() => {
+    console.log(`Successfully committed ${gfgProblemName} to GitHub`);
+  });
+}
+
+export { uploadOnAcceptedSubmission, uploadGFGProblem, uploadGitHubFile, decode_base64, encode_base64 };
