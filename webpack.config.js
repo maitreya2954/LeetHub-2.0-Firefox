@@ -2,7 +2,7 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 
-const entries = ['leetcode', 'welcome'];
+const entries = ['leetcode', 'welcome', 'gfg'];
 const extensionVersion = process.env.npm_package_version;
 
 // Ignore when copying
@@ -15,6 +15,7 @@ const ignore = [
   '**/webpack*',
   '**/scripts/leetcode/**',
   '**/scripts/welcome.js',
+  '**/scripts/gfg.js',
   '**/README.md',
   '**/assets/extension', // web store assets
   '**/assets/firefox',
@@ -38,6 +39,7 @@ module.exports = {
   entry: {
     leetcode: path.resolve(__dirname, 'scripts', 'leetcode', 'leetcode.js'),
     welcome: './scripts/welcome.js',
+    gfg: './scripts/gfg.js',
   },
   watchOptions: {
     ignored: '**/dist/**',

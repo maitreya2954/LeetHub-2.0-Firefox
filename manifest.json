@@ -16,7 +16,9 @@
     "128": "assets/thumbnail.png"
   },
   "background": {
-    "scripts": ["scripts/background.js"]
+    "scripts": [
+      "scripts/background.js"
+    ]
   },
   "permissions": [
     "unlimitedStorage",
@@ -25,17 +27,32 @@
   ],
   "content_scripts": [
     {
-      "matches": ["https://leetcode.com/*"],
-      "js": ["scripts/browserutil.js", "scripts/leetcode.js"],
+      "matches": [
+        "https://leetcode.com/*"
+      ],
+      "js": [
+        "scripts/browserutil.js",
+        "scripts/leetcode.js"
+      ],
       "run_at": "document_idle"
     },
     {
-      "matches": ["https://github.com/*"],
-      "js": ["scripts/browserutil.js", "scripts/authorize.js"]
+      "matches": [
+        "https://github.com/*"
+      ],
+      "js": [
+        "scripts/browserutil.js",
+        "scripts/authorize.js"
+      ]
     },
     {
-      "matches": ["https://practice.geeksforgeeks.org/*"],
-      "js": ["scripts/browserutil.js", "scripts/gfg.js"]
+      "matches": [
+        "https://practice.geeksforgeeks.org/*"
+      ],
+      "js": [
+        "scripts/browserutil.js",
+        "dist/gfg.js"
+      ]
     }
   ],
   "content_security_policy": {

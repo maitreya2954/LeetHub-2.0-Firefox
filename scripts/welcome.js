@@ -44,11 +44,15 @@ const syncStats = async () => {
   let pStatsJson = decodeURIComponent(escape(atob(data.content)));
   let pStats = await JSON.parse(pStatsJson);
 
-  api.storage.local.set({ stats: pStats.leetcode, sync_stats: false }, () =>
+  // Support both old format (pStats.leetcode) and new format (pStats.combined)
+  // prioritize combined if it exists (indicates both LeetCode and GFG are being tracked)
+  const statsToSync = pStats.combined || pStats.leetcode || pStats.stats;
+
+  api.storage.local.set({ stats: statsToSync, sync_stats: false }, () =>
     console.log(`Successfully synced local stats with GitHub stats`)
   );
-  // emulate return value of api.storage.local.get('stats') which is { stats: {easy, hard, medium, solved, shas}}
-  return { stats: pStats.leetcode };
+  // emulate return value of api.storage.local.get('stats')
+  return { stats: statsToSync };
 };
 
 const getCreateErrorString = (statusCode, name) => {

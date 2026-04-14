@@ -15,9 +15,11 @@ $('#reset_stats').on('click', () => {
   $('#reset_yes')
     .off('click')
     .on('click', () => {
+      // Clear all stats and reset display
       BrowserUtil.instance.storage.local.set({ stats: null });
       updateStats(0, 0, 0, 0);
       $('#reset_confirmation').hide();
+      console.log('Stats reset successfully');
     });
   $('#reset_no')
     .off('click')
@@ -37,6 +39,33 @@ function updateStats(total, easy, medium, hard) {
     window.myPieChart.data.datasets[0].data = [easy, medium, hard];
     window.myPieChart.update();
   }
+}
+
+/**
+ * Calculate combined stats from different platforms
+ * Handles both old format (single stats) and new format (platform-separated)
+ */
+function getCombinedStats(stats) {
+  if (!stats) {
+    return { solved: 0, easy: 0, medium: 0, hard: 0 };
+  }
+
+  // New format with platform separation
+  if (stats.combined) {
+    return stats.combined;
+  }
+
+  // Old format - single stats object (backward compatibility)
+  if (stats.solved !== undefined) {
+    return {
+      solved: stats.solved,
+      easy: stats.easy || 0,
+      medium: stats.medium || 0,
+      hard: stats.hard || 0,
+    };
+  }
+
+  return { solved: 0, easy: 0, medium: 0, hard: 0 };
 }
 
 function initializeChart() {
@@ -100,7 +129,8 @@ BrowserUtil.instance.storage.local.get('leethub_token', data => {
               initializeChart();
               BrowserUtil.instance.storage.local.get(['stats', 'leethub_hook'], data3 => {
                 const stats = data3?.stats || { solved: 0, easy: 0, medium: 0, hard: 0 };
-                updateStats(stats.solved, stats.easy, stats.medium, stats.hard);
+                const combined = getCombinedStats(stats);
+                updateStats(combined.solved, combined.easy, combined.medium, combined.hard);
                 const leethubHook = data3?.leethub_hook;
                 if (leethubHook) {
                   $('#repo_url').html(
